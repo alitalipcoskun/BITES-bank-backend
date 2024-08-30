@@ -27,16 +27,20 @@ public class AuthenticationService {
             This will allow us to create user and save it to the database.
             Moreover, it will return the generated token out of it.
         */
+
+        //Creating user
         var user = User.builder()
                 .name(request.getName())
                 .surname(request.getSurname())
                 .mail(request.getMail())
                 .phone(request.getPhone())
                 .password(passwordEncoder.encode(request.getPassword())) //We need to encode password for safety.
-                .role(Role.USER)
+                .role(Role.USER)//Default role for every user at the moment.
                 .build();
 
+        //Saving to the db
         repository.save(user);
+        //Generating token
         var jwt = jwtService.generateToken(user);
         return AuthenticationResponse.builder()
                 .token(jwt)
@@ -52,11 +56,11 @@ public class AuthenticationService {
                 )
         );
 
-
+        //Checking the phone number and reaching to the info of user
         var user = repository.findByPhone(request.getPhone())
                 .orElseThrow();// Catch exceptions and handle them.
 
-        //If user is in db, returns its information.
+        //If user is in db, returns its permission
         var jwt = jwtService.generateToken(user);
         return AuthenticationResponse.builder()
                 .token(jwt)

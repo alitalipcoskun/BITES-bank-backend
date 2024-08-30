@@ -82,7 +82,7 @@ public class JwtService {
             As a backend service the verification of JWT did not change during process is mandatory.
 
             The sign in key will be used in a conjuction with the sign-in algorithm specified in the JWT header to create the signature.
-            The key size is depends on the level of the trust of the sign-in party and your application.
+            The key size is depending on the level of the trust of the sign-in party and your application.
             There are tools to create SHA-256 or other signing approaches.
          */
         return Jwts
