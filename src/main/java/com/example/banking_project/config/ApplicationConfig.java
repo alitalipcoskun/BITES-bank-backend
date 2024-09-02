@@ -15,7 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 @RequiredArgsConstructor
-public class UserConfig {
+public class ApplicationConfig {
     private final UserRepository userRepository;
     //Beans should be public!
     @Bean
@@ -32,25 +32,25 @@ public class UserConfig {
             and also encode password and so forth.
             We have many implementations. One of them is DaoAuthenticationProvider.
         */
-
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+
         //We need to tell to the authentication provider which user details service to use in order to fetch
         //information of our user hence we may have different userDetailsService.
         authProvider.setUserDetailsService(userDetailsService());
+
         //Provide password encoder
         authProvider.setPasswordEncoder(passwordEncoder());
 
-
         //This is the minimum requirement for an authProvider
         return authProvider;
-
-
     }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
+
     /*
         Last step to finish this class is AuthenticationManager
         It is responsible to manage auth, with its methods.

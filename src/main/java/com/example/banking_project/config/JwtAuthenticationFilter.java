@@ -27,6 +27,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import java.io.IOException;
 
@@ -34,6 +35,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
+    private final HandlerExceptionResolver handlerExceptionResolver;
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
     @Override
@@ -60,34 +62,39 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
+        //Try catch block wraps the logic and uses HandlerExceptionResolver to forward the error to the global exception handler.
+        try{
+            //Extracting token from header, seperating header from "Bearer " substring.
+            jwt = authHeader.substring(7);
 
-        //Extracting token from header, seperating header from "Bearer " substring.
-        jwt = authHeader.substring(7);
+            //To extract the user information, another class is created in this class. It is named as username because of the
+            //service that is provided by Spring Boot.
+            userPhone = jwtService.extractUsername(jwt);
+            System.out.println(userPhone);
 
-        //To extract the user information, another class is created in this class. It is named as username because of the
-        //service that is provided by Spring Boot.
-        userPhone = jwtService.extractUsername(jwt);
-        System.out.println(userPhone);
+            //Checking user permission and whether user is in database or not.
+            //SecurityContextHolder.getContext().getAuthentication() -> NULL means user is not authenticated yet (not connected yet).
+            if(userPhone != null && SecurityContextHolder.getContext().getAuthentication() == null){
+                UserDetails userDetails = this.userDetailsService.loadUserByUsername(userPhone);
+                if(jwtService.isTokenValid(jwt, userDetails)){
+                    //If the user is valid, we need to update SecurityContext and send it to DispatcherServlet
+                    //This variable is mandatory to update the security context.
 
-        //Checking user permission and whether user is in database or not.
-        //SecurityContextHolder.getContext().getAuthentication() -> NULL means user is not authenticated yet (not connected yet).
-        if(userPhone != null && SecurityContextHolder.getContext().getAuthentication() == null){
-            UserDetails userDetails = this.userDetailsService.loadUserByUsername(userPhone);
-            if(jwtService.isTokenValid(jwt, userDetails)){
-                //If the user is valid, we need to update SecurityContext and send it to DispatcherServlet
-                //This variable is mandatory to update the security context.
-
-                UsernamePasswordAuthenticationToken authToken =  new UsernamePasswordAuthenticationToken(
-                        userDetails,
-                        null,
-                        userDetails.getAuthorities()
-                );
-                authToken.setDetails(
-                        new WebAuthenticationDetailsSource().buildDetails(request)
-                );
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+                    UsernamePasswordAuthenticationToken authToken =  new UsernamePasswordAuthenticationToken(
+                            userDetails,
+                            null,
+                            userDetails.getAuthorities()
+                    );
+                    authToken.setDetails(
+                            new WebAuthenticationDetailsSource().buildDetails(request)
+                    );
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                }
             }
+            filterChain.doFilter(request, response);
+        } catch (Exception exception){
+            handlerExceptionResolver.resolveException(request, response, null, exception);
         }
-        filterChain.doFilter(request, response);
+
     }
 }

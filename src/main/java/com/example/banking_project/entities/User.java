@@ -3,6 +3,7 @@ package com.example.banking_project.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.Accessors;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
@@ -21,9 +22,9 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name="_user")
+@Accessors(chain=true)
 public class User implements UserDetails {
     //The implemented class is used in JWT processes.
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)//JPA controls the generation of this attribute
     private Long id;

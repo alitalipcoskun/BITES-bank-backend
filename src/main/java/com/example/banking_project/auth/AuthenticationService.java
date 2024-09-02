@@ -1,9 +1,14 @@
 package com.example.banking_project.auth;
 
+import com.example.banking_project.auth.AuthenticationRequest;
+import com.example.banking_project.auth.AuthenticationResponse;
+import com.example.banking_project.auth.RegisterRequest;
 import com.example.banking_project.config.JwtService;
 import com.example.banking_project.entities.Role;
 import com.example.banking_project.entities.User;
+import com.example.banking_project.repos.AccountRepository;
 import com.example.banking_project.repos.UserRepository;
+import com.example.banking_project.services.AccountService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
