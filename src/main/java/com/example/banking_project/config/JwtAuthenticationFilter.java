@@ -20,6 +20,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -70,7 +71,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             //To extract the user information, another class is created in this class. It is named as username because of the
             //service that is provided by Spring Boot.
             userPhone = jwtService.extractUsername(jwt);
-            System.out.println(userPhone);
 
             //Checking user permission and whether user is in database or not.
             //SecurityContextHolder.getContext().getAuthentication() -> NULL means user is not authenticated yet (not connected yet).
@@ -79,7 +79,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 if(jwtService.isTokenValid(jwt, userDetails)){
                     //If the user is valid, we need to update SecurityContext and send it to DispatcherServlet
                     //This variable is mandatory to update the security context.
-
                     UsernamePasswordAuthenticationToken authToken =  new UsernamePasswordAuthenticationToken(
                             userDetails,
                             null,

@@ -1,14 +1,10 @@
 package com.example.banking_project.auth;
 
-import com.example.banking_project.auth.AuthenticationRequest;
-import com.example.banking_project.auth.AuthenticationResponse;
-import com.example.banking_project.auth.RegisterRequest;
 import com.example.banking_project.config.JwtService;
 import com.example.banking_project.entities.Role;
 import com.example.banking_project.entities.User;
-import com.example.banking_project.repos.AccountRepository;
 import com.example.banking_project.repos.UserRepository;
-import com.example.banking_project.services.AccountService;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -52,7 +48,7 @@ public class AuthenticationService {
                 .build();
     }
 
-    public AuthenticationResponse authenticate(AuthenticationRequest request) {
+    public AuthenticationResponse authenticate(AuthenticationRequest request, HttpServletResponse response) {
         //Authentication Manager has a role for giving permission.
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -66,7 +62,8 @@ public class AuthenticationService {
                 .orElseThrow();// Catch exceptions and handle them.
 
         //If user is in db, returns its permission
-        var jwt = jwtService.generateToken(user);
+        String jwt = jwtService.generateToken(user);
+
         return AuthenticationResponse.builder()
                 .token(jwt)
                 .build();

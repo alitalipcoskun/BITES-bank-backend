@@ -7,6 +7,7 @@ import com.example.banking_project.auth.AuthenticationRequest;
 import com.example.banking_project.auth.AuthenticationResponse;
 import com.example.banking_project.auth.AuthenticationService;
 import com.example.banking_project.auth.RegisterRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -28,8 +29,11 @@ public class AuthenticationController {
 
     @PostMapping("/authenticate")
     public ResponseEntity<AuthenticationResponse>authenticate(
-            @RequestBody AuthenticationRequest request
+            @RequestBody AuthenticationRequest request,
+            HttpServletResponse response
     ){
-        return ResponseEntity.ok(service.authenticate(request));
+        AuthenticationResponse authenticationResponse = service.authenticate(request, response);
+        return ResponseEntity.ok(authenticationResponse)
+                ;
     }
 }

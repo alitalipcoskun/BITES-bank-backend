@@ -1,5 +1,6 @@
 package com.example.banking_project.auth;
 
+import jakarta.servlet.http.Cookie;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
