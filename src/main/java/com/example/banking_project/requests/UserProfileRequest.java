@@ -1,6 +1,4 @@
-package com.example.banking_project.auth;
-
-import com.example.banking_project.entities.Role;
+package com.example.banking_project.requests;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,8 +9,6 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class AuthenticationResponse {
-    //JSON Web Tokens
+public class UserProfileRequest {
     private String token;
-    private Role role;
 }

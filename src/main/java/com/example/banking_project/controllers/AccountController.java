@@ -2,7 +2,6 @@ package com.example.banking_project.controllers;
 
 
 import com.example.banking_project.dtos.AccountDTO;
-import com.example.banking_project.dtos.TransactionDTO;
 import com.example.banking_project.requests.*;
 import com.example.banking_project.services.AccountService;
 import com.example.banking_project.services.TransactionService;
@@ -13,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin(origins = "http://localhost:3000")  // Allow your frontend URL
 @RestController
 @RequestMapping("/api/v1/account")
 @RequiredArgsConstructor
