@@ -134,6 +134,7 @@ public class AccountService {
     }
 
     private String extractPhone(){
+        // CHANGE IS MANDATORY
         //User JWT is provided by Bearer part.
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
@@ -159,7 +160,7 @@ public class AccountService {
 
 
     public List<AccountDTO> deleteAccount(DelAccRequest request) {
-        //BURAYI DANIŞ.
+        //CHANGE IS MANDATORY
         //Extracting unique user claim
         String userPhone = extractPhone();
 

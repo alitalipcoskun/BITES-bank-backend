@@ -121,3 +121,36 @@ spring.security.user.password=Test12345_
 node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 ``
 is used to create Secret key.
+
+## Quick Reminder
+In the case of API services, we should also document our “contracts.” This can be accomplished using Swagger/Openapi/Postman collections and contract tests.
+
+## 4 Common mistakes while building Java Spring Boot applications
+Spring is very good at showing error. Think about the use cases of these annotations. Do not overuse them.
+Inefficient management of application.yml.
+Exception handling. Using specific exceptions will be helpful for debugging and giving feedback to the user.
+@GlobalExceptionHandling is another approach, service by service expection handling is good thinking for bigger
+projects.
+
+Normal Throw error structure is not good for the frontend hence it is 500 coded.
+
+Request goes to the controller, then goes to the service, and the service makes the transformations for
+specified endpoint that is executed by the frontend. So, the exception is handled on service and goes to 
+the controller again.
+
+Exception handler is kind of listener and detects whether we have an exception on them for the controller or controllers.
+It is not mandatory to catch errors. We have to capture the handled exceptions. When it receives exception,
+it gives feedback to the user. Instead of giving report, it returns comprehensive error message.
+
+```java
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+@RestControllerAdvice
+
+public class GlobalExceptionHandler{
+    
+}
+```
+
+This annotation will help us to catch all of the exceptions thrown and send necesarry feedbacks to the frontend for
+every service. Transaction kontrol edilir.

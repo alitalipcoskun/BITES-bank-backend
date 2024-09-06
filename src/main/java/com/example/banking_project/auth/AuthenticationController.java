@@ -3,6 +3,7 @@ package com.example.banking_project.auth;
 This controller have two endpoints for login and sign up screens.
 */
 
+import com.example.banking_project.dtos.UserDTO;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +19,7 @@ public class AuthenticationController {
     //These endpoints are for creating user and checking the authentications.
     private final AuthenticationService service;
     @PostMapping("/register")
-    public ResponseEntity<AuthenticationResponse> register(
+    public ResponseEntity<UserDTO> register(
             @Valid @RequestBody RegisterRequest request
             ){
         return ResponseEntity.ok(service.register(request));
@@ -26,11 +27,9 @@ public class AuthenticationController {
 
     @PostMapping("/authenticate")
     public ResponseEntity<AuthenticationResponse>authenticate(
-            @RequestBody AuthenticationRequest request,
-            HttpServletResponse response
+            @Valid @RequestBody AuthenticationRequest request
     ){
-        AuthenticationResponse authenticationResponse = service.authenticate(request, response);
-        return ResponseEntity.ok(authenticationResponse)
-                ;
+        AuthenticationResponse authenticationResponse = service.authenticate(request);
+        return ResponseEntity.ok(authenticationResponse);
     }
 }

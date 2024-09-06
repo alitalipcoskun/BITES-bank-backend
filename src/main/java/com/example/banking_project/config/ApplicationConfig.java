@@ -51,8 +51,6 @@ public class ApplicationConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
-
     /*
         Last step to finish this class is AuthenticationManager
         It is responsible to manage auth, with its methods.

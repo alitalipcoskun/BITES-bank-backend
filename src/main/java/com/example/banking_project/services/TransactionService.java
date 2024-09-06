@@ -42,6 +42,7 @@ public class TransactionService {
         Optional<Account> fromAccOpt = accountRepository.findByNo(fromAccNo);
         //Extract account
         Account fromAcc = extractData(fromAccOpt);
+        //LUHN algoritması
         //Extract the phone number of current session
         String sessionPhoneNum = extractPhone();
 

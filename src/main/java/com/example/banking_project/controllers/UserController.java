@@ -25,11 +25,8 @@ public class UserController {
     @PostMapping("/profile")
     public ResponseEntity<User> getUserProfile(@Valid @RequestBody UserProfileRequest request) {
         //User JWT is provided by Bearer part.
-        System.out.println(request);
         String jwt = request.getToken();
-        System.out.println("JWT "+ jwt);
         String userPhone = jwtService.extractUsername(jwt);
-        System.out.println("Phone "+ userPhone);
 
         //Returns response entity UNAUTHORIZED for the user that does not have JWT.
         if (userPhone == null) {
