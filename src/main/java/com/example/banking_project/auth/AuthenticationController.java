@@ -22,6 +22,7 @@ public class AuthenticationController {
     public ResponseEntity<UserDTO> register(
             @Valid @RequestBody RegisterRequest request
             ){
+        // Perform register operation on AuthenticationService.
         return ResponseEntity.ok(service.register(request));
     }
 
@@ -29,6 +30,7 @@ public class AuthenticationController {
     public ResponseEntity<AuthenticationResponse>authenticate(
             @Valid @RequestBody AuthenticationRequest request
     ){
+        // Perform authenticate operation on AuthenticationService.
         AuthenticationResponse authenticationResponse = service.authenticate(request);
         return ResponseEntity.ok(authenticationResponse);
     }

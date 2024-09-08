@@ -18,7 +18,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AccountController {
     private final AccountService accountService;
-    private final TransactionService transactionService;
+
 
 
     //Create
@@ -26,6 +26,7 @@ public class AccountController {
     public ResponseEntity<AccountDTO> createAccount(
             @Valid @RequestBody CreateAccountRequest request
     ){
+        // Perform account creation in AccountService.
         return ResponseEntity.ok(accountService.create(request));
     }
 

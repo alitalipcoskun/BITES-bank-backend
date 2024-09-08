@@ -16,6 +16,6 @@ public class ErrorMessage {
     private Integer statusCode;
     private HttpStatus status;
     private Date timestamp;
-    private String title;
+    private String message;
     private String description;
 }

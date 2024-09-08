@@ -41,10 +41,12 @@ public class AuthenticationService {
         // Verify that userPhone or mail does not registered on database, otherwise throws error.
 
 
+        // Verify that phone does not exist on the user database
         checkUserPhoneExits(request.getPhone());
+        // Verify that mail does not exist on the user database
         checkUserMailExits(request.getMail());
 
-        // If the user does not exist on db, then creating user is allowed.
+        // Perform build operation for the user.
         User user = User.builder()
                 .name(request.getName())
                 .surname(request.getSurname())
@@ -54,7 +56,7 @@ public class AuthenticationService {
                 .role(Role.USER) //Default role for every user at the moment.
                 .build();
 
-        // Saving the created user to the db
+        // Perform save operation to the user database
         repository.save(user);
 
         // Return as DTO
@@ -76,16 +78,16 @@ public class AuthenticationService {
             if it does not exist, then throws error.
         */
 
-
+        System.out.println(request.getPhone());
         //Authentication Manager has a role for giving permission.
         User user;
-        user = findUserByPhone(request.getPhone());
+        user = findUserByPhone(request.getPhone()); // Check user whether the phone number exists on database.
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getPhone(),
                         request.getPassword()
                 )
-        ); // Throw mechanism will be added to this part also.
+        ); // Thrown errors has caught by GlobalExceptionHandler.
 
         //If user is in db, returns its permission
         String jwt = jwtService.generateToken(user);
@@ -116,7 +118,7 @@ public class AuthenticationService {
             // Expected behaviour.
             return null;
         }else{
-            throw new ResourceExistException("The content already exists"); // To give information to the client.
+            throw new ResourceExistException("The entered mail or phone already registered to the website. Try different."); // To give information to the client.
         }
 
     }

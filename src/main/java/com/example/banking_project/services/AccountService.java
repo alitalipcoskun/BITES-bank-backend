@@ -3,6 +3,7 @@ package com.example.banking_project.services;
 import com.example.banking_project.config.JwtService;
 import com.example.banking_project.entities.Account;
 import com.example.banking_project.entities.User;
+import com.example.banking_project.exceptions.ResourceExistException;
 import com.example.banking_project.repos.AccountRepository;
 import com.example.banking_project.repos.UserRepository;
 import com.example.banking_project.requests.AccAddBalanceReq;
@@ -10,13 +11,14 @@ import com.example.banking_project.requests.CreateAccountRequest;
 import com.example.banking_project.requests.DelAccRequest;
 import com.example.banking_project.requests.GetAccountRequest;
 import com.example.banking_project.dtos.AccountDTO;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+
 
 import java.util.List;
 import java.util.Objects;
@@ -57,6 +59,7 @@ public class AccountService {
         accountRepository.save(newAccount);
 
         // Build the response
+        // This response may change as success response message, or a new pop up can be shown in the client app.
         return AccountDTO.builder()
                 .id(newAccount.getId())
                 .balance(newAccount.getBalance())
@@ -67,14 +70,13 @@ public class AccountService {
     }
 
     public List<AccountDTO> getAccounts(@Valid GetAccountRequest request){
-        //BURAYI DANIŞ
         //Extracting unique data from request
         String userPhone = request.getPhoneNumber();
         //Validate that current user has permission to see the accounts
         String validationPhone = extractPhone();
 
         if(!Objects.equals(validationPhone, userPhone)){
-            throw new IllegalArgumentException("No permission!");
+            throw new IllegalArgumentException("User does not authorized to reach to the accounts.");
         }
 
         //Finding user with specified unique value.
@@ -86,7 +88,7 @@ public class AccountService {
         Optional<List<Account>> accountsOpt = accountRepository.findByUserId(user.getId());
 
         //Extracting account or accounts.
-        List <Account> accounts = extractData(accountsOpt);
+        List <Account> accounts = extractAccounts(accountsOpt);
 
         //Returns the list of AccountResponse DTOs
         return accounts.stream().map(account -> new AccountDTO(
@@ -97,10 +99,18 @@ public class AccountService {
                 account.getUser().getId()
         )).collect(Collectors.toList());
     }
+
+    private List<Account> extractAccounts(Optional<List<Account>> accountsOpt) {
+        if (accountsOpt.isEmpty() || ArrayUtils.isEmpty(accountsOpt.get().toArray())){
+            throw new ResourceExistException("Account list is empty");
+        }
+        return accountsOpt.get();
+    }
+
     private <T> T extractData(Optional<T> optionalT){
         //Checking whether user has optional data or not.
         if(optionalT.isEmpty()){
-            throw new IllegalArgumentException("Return type is empty.");
+            throw new IllegalArgumentException("Session does not found!");
         }
         return optionalT.get();
     }
@@ -112,11 +122,14 @@ public class AccountService {
     }
 
 
+    @Transactional
     public AccountDTO addBalance(AccAddBalanceReq request) {
         //Fetching the account data with the unique identifier
         Optional<Account> accountOpt = accountRepository.findByNo(request.getAccountNo());
         //Extracting data from Optional dtype
         Account account =  extractData(accountOpt);
+
+        // Search for an annotation to use for this function.
         //Setting new balance to the account
         account.setBalance(account.getBalance()+request.getBalanceChange());
         accountRepository.save(account);
@@ -134,7 +147,11 @@ public class AccountService {
     }
 
     private String extractPhone(){
-        // CHANGE IS MANDATORY
+        /*
+            This code retrieves the currently authenticated user's information (as a UserDetails object) from the
+            security context in a Spring Security application. It allows you to access the logged-in user's details,
+            such as their username and roles.
+        */
         //User JWT is provided by Bearer part.
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
@@ -154,7 +171,7 @@ public class AccountService {
 
     private void validateAccBalance(Account account, Float validationAmount){
         if(account.getBalance() > validationAmount){
-            throw new IllegalArgumentException("Account has balance. Try to transfer it to the different account.");
+            throw new ResourceExistException("Account has balance. Try to transfer it to the different account.");
         }
     }
 
@@ -178,7 +195,7 @@ public class AccountService {
 
         //Extracting the account whose owned by current session user.
         Optional<List<Account>> accListOpt = accountRepository.findByUserId(account.getUser().getId());
-        List<Account> accounts = extractData(accListOpt);
+        List<Account> accounts = extractAccounts(accListOpt);
 
         //Return the accounts (if they exists)
         return accounts.stream().map(accountIter -> new AccountDTO(

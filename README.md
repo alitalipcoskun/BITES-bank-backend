@@ -8,6 +8,10 @@ There is no need for XML configuration and no code generation.
 
 `https://start.spring.io` allow developers to use specified Spring Boot version and satisfy requirements.
 
+## Future Features
+`@Transaction` annotation will be implemented after **handling exceptions**.
+Does the `password` should be sent encrypted to the `AuthenticationService`.
+
 ## Project Creation
 
 ![Project.png](readme_images%2FProject.png)
@@ -138,6 +142,8 @@ Request goes to the controller, then goes to the service, and the service makes 
 specified endpoint that is executed by the frontend. So, the exception is handled on service and goes to 
 the controller again.
 
+
+## Exception Handling
 Exception handler is kind of listener and detects whether we have an exception on them for the controller or controllers.
 It is not mandatory to catch errors. We have to capture the handled exceptions. When it receives exception,
 it gives feedback to the user. Instead of giving report, it returns comprehensive error message.
@@ -153,4 +159,4 @@ public class GlobalExceptionHandler{
 ```
 
 This annotation will help us to catch all of the exceptions thrown and send necesarry feedbacks to the frontend for
-every service. Transaction kontrol edilir.
+every service.
