@@ -52,7 +52,7 @@ public class SecurityConfiguration {
                 .csrf(csrf -> csrf.disable())  // Disabling CSRF protection
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(authz -> authz
-                        .requestMatchers("/api/v1/auth/**", "/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()//Permitted links for all sessions
+                        .requestMatchers("/api/v1/auth/**", "/api/v1/auth/authenticate", "/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()//Permitted links for all sessions
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session

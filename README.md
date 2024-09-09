@@ -9,11 +9,10 @@ There is no need for XML configuration and no code generation.
 `https://start.spring.io` allow developers to use specified Spring Boot version and satisfy requirements.
 
 ## Future Features
-`@Transaction` annotation will be implemented after **handling exceptions**.
-Does the `password` should be sent encrypted to the `AuthenticationService`.
+Does the `password` should be sent encrypted to the `AuthenticationService`?
+Transaction algorithm? -> The luhn algorithm. may be implemented for checking purposes and creation of accNo.
 
 ## Project Creation
-
 ![Project.png](readme_images%2FProject.png)
 
 Figure: `start.spring.io` interface for beginning of the project.
@@ -23,7 +22,9 @@ The choice between Gradle and Maven depends on your project’s specific needs a
 Maven is used for more structured project, and Gradle is an option for more flexible projects. I preferred maven in this project.
 
 ### Meaning of Language
-I wanted to build a Spring Boot application with Java programming language, so my choice is Java.
+I wanted to build a Spring Boot application with Java programming language, so my choice is Java because of that.
+Java is commonly used in backend applications thanks to Spring Boot and its community. There are various tools for
+backend service that must satisfy specific requirements.
 
 
 ### Meaning of Keywords for Spring Boot Versions
@@ -59,7 +60,7 @@ allow developer to focus on the business logic instead of these repetitive code 
 </dependency>
 ```
 
-As a developer which use Maven, you can use `Project Lombok` with adding it to pom.xml file just like this.
+As a developer which use Maven, you can use `Project Lombok` with adding it to `pom.xml` file just like this.
 
 ```java
 
@@ -83,6 +84,19 @@ Note that, `@Data` is all together a shortcut for @Getter, @Setter, @EqualsAndHa
 This annotation generates all the boilerplate that is normally associated with simple POJOs (Plain Old Java Objects).
 However, it does not use annotations 'callSuper, includeFieldNames, exclude'. All generated getters and setters are set as public access.
 
+#### Transaction Annotation
+The annotation allows backend service to roll back to process if it is unable to satisfy the requirements such as
+stock control. If the process does not have conditions to be satisfied or crashes eventually, then rollback starts.
+
+```java
+@Transactional
+```
+
+It is used with only `public` methods. When it is used on public method, behind the scenes a proxy class is created. The
+public method got wrapped up with additional functionality. It acts like a guard. When the function starts to run,
+then it opens the transaction. The transaction gets closed when the function gets executed successfully. If it receives an
+error, then the function got roll back, and this avoids business logic errors, and the function works more precisely.
+
 ````xml
 <dependencies>
     <dependency>
@@ -102,32 +116,18 @@ However, it does not use annotations 'callSuper, includeFieldNames, exclude'. Al
     </dependency>
 </dependencies>
 ````
-This libraries are required for JWT Token manipulation.
+These libraries are required for JWT Token manipulation.
 
 
-````properties
-spring.datasource.url=jdbc:postgresql://localhost:5433/bites_crud
-spring.datasource.username=postgres
-spring.datasource.password=12345
-spring.datasource.driver-class-name=org.postgresql.Driver
-
-# JPA and Hibernate configuration (if you're using Spring Data JPA)
-spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect
-spring.jpa.hibernate.ddl-auto=update
-spring.jpa.show-sql=true
-security.jwt.secret-key=3cfa76ef14937c1c0ea519f8fc057a80fcd04a7420f8e8bcd0a7567c272e007b
-# 1h in millisecond
-security.jwt.expiration-time=3600000
-# For making security key static
-spring.security.user.password=Test12345_
-````
-``bash
+```bash
 node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
-``
-is used to create Secret key.
+```
+
+This one line code is used to create Secret key.
 
 ## Quick Reminder
-In the case of API services, we should also document our “contracts.” This can be accomplished using Swagger/Openapi/Postman collections and contract tests.
+In the case of API services, we should also document our “contracts.” This can be accomplished using Swagger/Openapi/Postman collections and contract tests,
+according to the Trendyol Tech.
 
 ## 4 Common mistakes while building Java Spring Boot applications
 Spring is very good at showing error. Think about the use cases of these annotations. Do not overuse them.
@@ -136,14 +136,14 @@ Exception handling. Using specific exceptions will be helpful for debugging and 
 @GlobalExceptionHandling is another approach, service by service expection handling is good thinking for bigger
 projects.
 
-Normal Throw error structure is not good for the frontend hence it is 500 coded.
+Normal Throw error structure is not good for the frontend hence it is 500 coded for every error.
 
 Request goes to the controller, then goes to the service, and the service makes the transformations for
 specified endpoint that is executed by the frontend. So, the exception is handled on service and goes to 
 the controller again.
 
 
-## Exception Handling
+### Exception Handling
 Exception handler is kind of listener and detects whether we have an exception on them for the controller or controllers.
 It is not mandatory to catch errors. We have to capture the handled exceptions. When it receives exception,
 it gives feedback to the user. Instead of giving report, it returns comprehensive error message.
@@ -152,7 +152,6 @@ it gives feedback to the user. Instead of giving report, it returns comprehensiv
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
-
 public class GlobalExceptionHandler{
     
 }

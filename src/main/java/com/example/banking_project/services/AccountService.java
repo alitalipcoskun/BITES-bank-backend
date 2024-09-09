@@ -1,6 +1,5 @@
 package com.example.banking_project.services;
 
-import com.example.banking_project.config.JwtService;
 import com.example.banking_project.entities.Account;
 import com.example.banking_project.entities.User;
 import com.example.banking_project.exceptions.ResourceExistException;
@@ -14,10 +13,12 @@ import com.example.banking_project.dtos.AccountDTO;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 
 
 import java.util.List;
@@ -27,25 +28,23 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AccountService {
     private static final Random ACC_NO_GEN = new Random();
     private static final Integer ACC_GEN_BOUNDARY = 1_000_000_000;
 
-    private final JwtService jwtService;
-
     private final UserRepository userRepository;
     private final AccountRepository accountRepository;
 
-    public AccountDTO create(@Valid CreateAccountRequest request) {
+
+    @Transactional
+    public AccountDTO create(@Valid @RequestBody CreateAccountRequest request) {
         // Extract the user phone number from the token
         String userPhone = extractPhone();
         // Fetch the user based on the phone number
-        Optional<User> userOpt = userRepository.findByPhone(userPhone);
-
-        //Extracting user information
-        User user = extractData(userOpt);
+        User user = extractUserInfo(userPhone);
 
         // Build the new account associated with the fetched user
         var newAccount = Account.builder()
@@ -57,9 +56,10 @@ public class AccountService {
 
         // Save the new account to the database
         accountRepository.save(newAccount);
+        log.info("Account generated and saved to the database.");
 
         // Build the response
-        // This response may change as success response message, or a new pop up can be shown in the client app.
+        // This response may change as success response message, or a new pop-up can be shown in the client app.
         return AccountDTO.builder()
                 .id(newAccount.getId())
                 .balance(newAccount.getBalance())
@@ -69,26 +69,17 @@ public class AccountService {
                 .build();
     }
 
-    public List<AccountDTO> getAccounts(@Valid GetAccountRequest request){
+    public List<AccountDTO> getAccounts(@Valid @RequestBody GetAccountRequest request){
         //Extracting unique data from request
         String userPhone = request.getPhoneNumber();
         //Validate that current user has permission to see the accounts
         String validationPhone = extractPhone();
 
-        if(!Objects.equals(validationPhone, userPhone)){
-            throw new IllegalArgumentException("User does not authorized to reach to the accounts.");
-        }
+        checkPermission(validationPhone, userPhone);
 
-        //Finding user with specified unique value.
-        Optional<User> userOpt = userRepository.findByPhone(userPhone);
+        User user = extractUserInfo(userPhone);
 
-        //Extracting from Optional Data Type
-        User user = extractData(userOpt);
-        //Finding accounts that belongs to the user.
-        Optional<List<Account>> accountsOpt = accountRepository.findByUserId(user.getId());
-
-        //Extracting account or accounts.
-        List <Account> accounts = extractAccounts(accountsOpt);
+        List<Account> accounts = getAccountsByUserId(user.getId());
 
         //Returns the list of AccountResponse DTOs
         return accounts.stream().map(account -> new AccountDTO(
@@ -100,16 +91,41 @@ public class AccountService {
         )).collect(Collectors.toList());
     }
 
+    private void checkPermission(String validationPhone, String userPhone){
+        if(!Objects.equals(validationPhone, userPhone)){
+            log.error("User does not have permission to create account");
+            throw new IllegalArgumentException("User does not authorized to reach to the accounts.");
+        }
+    }
+
+    private User extractUserInfo(String userPhone){
+        //Finding user with specified unique value.
+        Optional<User> userOpt = userRepository.findByPhone(userPhone);
+
+        //Extracting from Optional Data Type
+        return extractData(userOpt);
+    }
+
     private List<Account> extractAccounts(Optional<List<Account>> accountsOpt) {
         if (accountsOpt.isEmpty() || ArrayUtils.isEmpty(accountsOpt.get().toArray())){
+            log.error("No account found!");
             throw new ResourceExistException("Account list is empty");
         }
         return accountsOpt.get();
     }
 
+    private List<Account> getAccountsByUserId(Long userId){
+        //Finding accounts that belongs to the user.
+        Optional<List<Account>> accountsOpt = accountRepository.findByUserId(userId);
+
+        //Extracting account or accounts.
+        return extractAccounts(accountsOpt);
+    }
+
     private <T> T extractData(Optional<T> optionalT){
         //Checking whether user has optional data or not.
         if(optionalT.isEmpty()){
+            log.error("The session does not exist");
             throw new IllegalArgumentException("Session does not found!");
         }
         return optionalT.get();
@@ -121,22 +137,25 @@ public class AccountService {
         return String.format("%010d", ACC_NO_GEN.nextInt(ACC_GEN_BOUNDARY));
     }
 
+    private Account extractAccByNo(String accNo){
+        //Fetching the account data with the unique identifier
+        Optional<Account> accountOpt = accountRepository.findByNo(accNo);
+        //Extracting data from Optional data type
+        return extractData(accountOpt);
+
+    }
+
 
     @Transactional
     public AccountDTO addBalance(AccAddBalanceReq request) {
-        //Fetching the account data with the unique identifier
-        Optional<Account> accountOpt = accountRepository.findByNo(request.getAccountNo());
-        //Extracting data from Optional dtype
-        Account account =  extractData(accountOpt);
-
+        Account account = extractAccByNo(request.getAccountNo());
         // Search for an annotation to use for this function.
         //Setting new balance to the account
         account.setBalance(account.getBalance()+request.getBalanceChange());
         accountRepository.save(account);
 
-        Optional<Account> returnedAccountOpt = accountRepository.findByNo(request.getAccountNo());
-        Account returnedAccount =  extractData(returnedAccountOpt);
-
+        // This side may change or add a new pop-up can be shown in the client app.
+        Account returnedAccount = extractAccByNo(request.getAccountNo());
         return AccountDTO.builder()
                 .userId(returnedAccount.getUser().getId())
                 .balance(returnedAccount.getBalance())
@@ -159,6 +178,8 @@ public class AccountService {
         if (userDetails == null) {
             throw new IllegalArgumentException("User not found!");
         }
+        log.info("User found!");
+
         //Extracting subject
         return userDetails.getUsername();
     }
@@ -175,14 +196,13 @@ public class AccountService {
         }
     }
 
-
+    @Transactional
     public List<AccountDTO> deleteAccount(DelAccRequest request) {
         //CHANGE IS MANDATORY
         //Extracting unique user claim
         String userPhone = extractPhone();
 
-        Optional<Account> accOpt = accountRepository.findByNo(request.getNo());
-        Account account = extractData(accOpt);
+        Account account = extractAccByNo(request.getNo());
 
         //Verify that account is owned by userPhone
         validateAccOwner(account, userPhone);
@@ -194,16 +214,15 @@ public class AccountService {
         accountRepository.removeByNo(account.getNo());
 
         //Extracting the account whose owned by current session user.
-        Optional<List<Account>> accListOpt = accountRepository.findByUserId(account.getUser().getId());
-        List<Account> accounts = extractAccounts(accListOpt);
+        List<Account> accounts = getAccountsByUserId(account.getUser().getId());
 
-        //Return the accounts (if they exists)
-        return accounts.stream().map(accountIter -> new AccountDTO(
-                accountIter.getId(),
-                accountIter.getNo(),
-                accountIter.getBalance(),
-                accountIter.getMoney_type(),
-                accountIter.getUser().getId()
+        //Return the accounts (if they already exists)
+        return accounts.stream().map(currAcc -> new AccountDTO(
+                currAcc.getId(),
+                currAcc.getNo(),
+                currAcc.getBalance(),
+                currAcc.getMoney_type(),
+                currAcc.getUser().getId()
         )).collect(Collectors.toList());
     }
 }

@@ -5,6 +5,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +26,8 @@ import java.util.function.Function;
     Extracting the expiration date
     Generating the token etc...
 */
+
+@Slf4j
 @Service
 public class JwtService {
     //
@@ -53,6 +56,7 @@ public class JwtService {
     }
 
     public String buildToken(Map<String, Object> extraClaims, UserDetails userDetails){
+        log.info("JWT successfully generated.");
         return Jwts
                 .builder()
                 .setClaims(extraClaims)
@@ -65,6 +69,7 @@ public class JwtService {
 
     public boolean isTokenValid(String token, UserDetails userDetails){
         //It will check whether token is owned by user or not
+        log.info("JWT is getting checked...");
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
     }
@@ -100,6 +105,7 @@ public class JwtService {
 
     private Key getSignInKey() {
         byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
+        log.info("Key generated:", keyBytes);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 }

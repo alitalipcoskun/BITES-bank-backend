@@ -13,8 +13,6 @@ import java.util.Date;
 @Builder
 @Setter
 public class ErrorMessage {
-    private Integer statusCode;
-    private HttpStatus status;
     private Date timestamp;
     private String message;
     private String description;

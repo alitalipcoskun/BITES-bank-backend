@@ -78,7 +78,6 @@ public class AuthenticationService {
             if it does not exist, then throws error.
         */
 
-        System.out.println(request.getPhone());
         //Authentication Manager has a role for giving permission.
         User user;
         user = findUserByPhone(request.getPhone()); // Check user whether the phone number exists on database.

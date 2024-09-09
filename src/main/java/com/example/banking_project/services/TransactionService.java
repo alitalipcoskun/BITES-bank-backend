@@ -5,16 +5,21 @@ import com.example.banking_project.config.JwtService;
 import com.example.banking_project.dtos.TransactionDTO;
 import com.example.banking_project.entities.Account;
 import com.example.banking_project.entities.Transaction;
+import com.example.banking_project.exceptions.ResourceExistException;
+import com.example.banking_project.exceptions.ResourceNotFoundException;
 import com.example.banking_project.repos.AccountRepository;
 import com.example.banking_project.repos.TransactionRepository;
 import com.example.banking_project.repos.UserRepository;
 import com.example.banking_project.requests.ListTransactionsReq;
 import com.example.banking_project.requests.TransferMoneyReq;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.Date;
 import java.util.List;
@@ -23,27 +28,21 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class TransactionService {
 
-    private final JwtService jwtService;
-    private final AccountService accountService;
-
-    private final UserRepository userRepository;
     private final AccountRepository accountRepository;
     private final TransactionRepository transactionRepository;
 
     @Transactional
-    public TransactionDTO makeTransaction(TransferMoneyReq request){
+    public TransactionDTO makeTransaction( @Valid @RequestBody TransferMoneyReq request){
         //Extracting information from received request
         String fromAccNo = request.getFrom_account();
         String toAccNo = request.getTo_account();
 
         //Retrieve from_acc owner
-        Optional<Account> fromAccOpt = accountRepository.findByNo(fromAccNo);
-        //Extract account
-        Account fromAcc = extractData(fromAccOpt);
-        //LUHN algoritması
+        Account fromAcc = findAccountByNo(fromAccNo);
         //Extract the phone number of current session
         String sessionPhoneNum = extractPhone();
 
@@ -58,8 +57,7 @@ public class TransactionService {
 
         // Send money
             //Find toAccount
-            Optional<Account> toAccOpt = accountRepository.findByNo(toAccNo);
-            Account toAcc = extractData(toAccOpt);
+            Account toAcc = findAccountByNo(toAccNo);
 
             //(Type check for the accounts may be implemented to here...)
 
@@ -91,9 +89,16 @@ public class TransactionService {
                 .build();
     }
 
+    private Account findAccountByNo(String accNo){
+        log.info("Account searching..");
+        return accountRepository.findByNo(accNo)
+                .orElseThrow(() -> new ResourceNotFoundException("Account not found"));
+    }
+
     private <T> T extractData(Optional<T> optionalT){
         //Checking whether user has optional data or not.
         if(optionalT.isEmpty()){
+            log.error("Null returned!");
             throw new IllegalArgumentException("Return type is empty.");
         }
         return optionalT.get();
@@ -105,6 +110,7 @@ public class TransactionService {
 
         //Returns response entity UNAUTHORIZED for the user that does not have JWT.
         if (userDetails == null) {
+            log.error("Unexpected Bearer");
             throw new IllegalArgumentException("The session does not found!");
         }
         //Extracting subject
@@ -121,14 +127,13 @@ public class TransactionService {
         }
     }
 
-    public List<TransactionDTO> listTransaction(ListTransactionsReq request) {
+    public List<TransactionDTO> listTransaction(@Valid @RequestBody ListTransactionsReq request) {
         //Extract accountNo and userPhone from user
         String accountNo = request.getAccountNo();
         String sessionPhone = extractPhone();
 
         //Extract account
-        Optional<Account> accOpt = accountRepository.findByNo(accountNo);
-        Account account = extractData(accOpt);
+        Account account = findAccountByNo(accountNo);
         validateAccOwner(account,sessionPhone);
 
         Optional<List<Transaction>> transactionsOpt = transactionRepository.findByFromAccountOrToAccount(account, account);
