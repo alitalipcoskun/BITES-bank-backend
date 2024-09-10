@@ -10,6 +10,7 @@ import com.example.banking_project.requests.CreateAccountRequest;
 import com.example.banking_project.requests.DelAccRequest;
 import com.example.banking_project.requests.GetAccountRequest;
 import com.example.banking_project.dtos.AccountDTO;
+import com.example.banking_project.responses.AccOwnerResponse;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -69,9 +70,9 @@ public class AccountService {
                 .build();
     }
 
-    public List<AccountDTO> getAccounts(@Valid @RequestBody GetAccountRequest request){
+    public List<AccountDTO> getAccounts(String userPhone){
+        // Add phone validation with jwt.!!!
         //Extracting unique data from request
-        String userPhone = request.getPhoneNumber();
         //Validate that current user has permission to see the accounts
         String validationPhone = extractPhone();
 
@@ -224,5 +225,15 @@ public class AccountService {
                 currAcc.getMoney_type(),
                 currAcc.getUser().getId()
         )).collect(Collectors.toList());
+    }
+
+    public AccOwnerResponse searchOwner(String accountNo) {
+        Account account = extractAccByNo(accountNo);
+
+        // Returning name and surname of the account owner if it exits.
+        return AccOwnerResponse.builder()
+                .name(account.getUser().getName())
+                .surname(account.getUser().getSurname())
+                .build();
     }
 }

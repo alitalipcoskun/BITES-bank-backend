@@ -3,24 +3,25 @@ package com.example.banking_project.controllers;
 
 import com.example.banking_project.dtos.AccountDTO;
 import com.example.banking_project.requests.*;
+import com.example.banking_project.responses.AccOwnerResponse;
 import com.example.banking_project.services.AccountService;
 import com.example.banking_project.services.TransactionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @CrossOrigin(origins = "http://localhost:3000")  // Allow your frontend URL
 @RestController
 @RequestMapping("/api/v1/account")
 @RequiredArgsConstructor
 public class AccountController {
     private final AccountService accountService;
-
-
 
     //Create
     @PostMapping("/new-account")
@@ -29,6 +30,14 @@ public class AccountController {
     ){
         // Perform account creation in AccountService.
         return ResponseEntity.ok(accountService.create(request));
+    }
+
+    @GetMapping("/search-account-owner")
+    public ResponseEntity<AccOwnerResponse> accountOwner(
+            @RequestParam("no") String accountNo
+    ){
+
+        return ResponseEntity.ok(accountService.searchOwner(accountNo));
     }
 
     //Update
@@ -42,9 +51,9 @@ public class AccountController {
     //Read
     @GetMapping("/accounts")
     public ResponseEntity <List<AccountDTO>> getAccount(
-            @Valid @RequestBody GetAccountRequest request
+            @RequestParam("phoneNumber") String phoneNumber
     ){
-        return ResponseEntity.ok(accountService.getAccounts(request));
+        return ResponseEntity.ok(accountService.getAccounts(phoneNumber));
     }
 
     // Delete account operation.
@@ -55,6 +64,7 @@ public class AccountController {
     public ResponseEntity <List<AccountDTO>> deleteAccount(
             @Valid @RequestBody DelAccRequest request
     ){
+
         return ResponseEntity.ok(accountService.deleteAccount(request));
     }
 }

@@ -32,6 +32,7 @@ public class UserDTO {
     private String mail;
 
     private String phone;
+    private List<String> accounts;
 
     private Role role;
 }

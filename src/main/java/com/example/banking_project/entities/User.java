@@ -41,6 +41,7 @@ public class User implements UserDetails {
     private String phone;
     private String password;
 
+    @ToString.Exclude
     @OneToMany(mappedBy = "user")
     private List<Account> accounts;
 
