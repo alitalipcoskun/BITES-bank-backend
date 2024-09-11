@@ -93,6 +93,7 @@ public class AccountService {
     }
 
     private void checkPermission(String validationPhone, String userPhone){
+        log.info(validationPhone, userPhone);
         if(!Objects.equals(validationPhone, userPhone)){
             log.error("User does not have permission to create account");
             throw new IllegalArgumentException("User does not authorized to reach to the accounts.");
