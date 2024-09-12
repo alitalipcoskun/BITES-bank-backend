@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TransferMoneyReq {
-    private String from_account;
-    private String to_account;
-    private float balanceChange;
+    private String fromAcc;
+    private String toAcc;
+    private float amount;
 }

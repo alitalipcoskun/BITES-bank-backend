@@ -153,7 +153,9 @@ public class AccountService {
         Account account = extractAccByNo(request.getAccountNo());
         // Search for an annotation to use for this function.
         //Setting new balance to the account
-        account.setBalance(account.getBalance()+request.getBalanceChange());
+        account.setBalance(account.getBalance()+ request.getBalanceChange());
+        log.info(String.valueOf(request.getBalanceChange()));
+        log.info(String.valueOf(account.getBalance()));
         accountRepository.save(account);
 
         // This side may change or add a new pop-up can be shown in the client app.

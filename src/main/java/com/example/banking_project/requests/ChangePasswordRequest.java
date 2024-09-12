@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class AccAddBalanceReq {
-    private String accountNo;
-    private Float balanceChange;
+public class ChangePasswordRequest {
+    private String currentPassword;
+    private String newPassword;
 }

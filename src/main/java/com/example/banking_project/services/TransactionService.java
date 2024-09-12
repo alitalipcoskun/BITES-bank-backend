@@ -38,8 +38,8 @@ public class TransactionService {
     @Transactional
     public TransactionDTO makeTransaction( @Valid @RequestBody TransferMoneyReq request){
         //Extracting information from received request
-        String fromAccNo = request.getFrom_account();
-        String toAccNo = request.getTo_account();
+        String fromAccNo = request.getFromAcc();
+        String toAccNo = request.getToAcc();
 
         //Retrieve from_acc owner
         Account fromAcc = findAccountByNo(fromAccNo);
@@ -50,7 +50,7 @@ public class TransactionService {
         validateAccOwner(fromAcc, sessionPhoneNum);
 
         //Extract transaction amount from request
-        Float transactionAmount = request.getBalanceChange();
+        Float transactionAmount = request.getAmount();
 
         // Verify that account has sufficient amount of balance to send money.
         validateAccBalance(fromAcc, transactionAmount);
