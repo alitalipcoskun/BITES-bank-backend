@@ -3,6 +3,7 @@ package com.example.banking_project.services;
 import com.example.banking_project.entities.Account;
 import com.example.banking_project.entities.User;
 import com.example.banking_project.exceptions.ResourceExistException;
+import com.example.banking_project.exceptions.ResourceNotFoundException;
 import com.example.banking_project.repos.AccountRepository;
 import com.example.banking_project.repos.UserRepository;
 import com.example.banking_project.requests.AccAddBalanceReq;
@@ -22,10 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -140,11 +138,14 @@ public class AccountService {
     }
 
     private Account extractAccByNo(String accNo){
-        //Fetching the account data with the unique identifier
-        Optional<Account> accountOpt = accountRepository.findByNo(accNo);
-        //Extracting data from Optional data type
-        return extractData(accountOpt);
 
+            Optional<Account> accOpt =  accountRepository.findByNo(accNo);
+
+            if (accOpt.isEmpty()){
+                throw new ResourceExistException("Account does not exist");
+            }
+
+            return accOpt.get();
     }
 
 
@@ -238,5 +239,13 @@ public class AccountService {
                 .name(account.getUser().getName())
                 .surname(account.getUser().getSurname())
                 .build();
+    }
+
+    public String getAccountOwner(String accountNo) {
+        Account account = extractAccByNo(accountNo);
+        String username = account.getUser().getName() + " " + account.getUser().getSurname();
+        return Arrays.stream(username.split(" "))
+                .map(s -> s.charAt(0) + "*".repeat(s.length() - 1))
+                .collect(Collectors.joining(" "));
     }
 }

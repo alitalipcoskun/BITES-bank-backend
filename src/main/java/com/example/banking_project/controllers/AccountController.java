@@ -67,4 +67,12 @@ public class AccountController {
 
         return ResponseEntity.ok(accountService.deleteAccount(request));
     }
+
+    @GetMapping("/account-owner")
+    public ResponseEntity<String> getAccountOwner(
+            @RequestParam("accountNo") String accountNo
+    ){
+        return ResponseEntity.ok(accountService.getAccountOwner(accountNo));
+    }
+
 }

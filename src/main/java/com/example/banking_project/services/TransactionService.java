@@ -61,6 +61,8 @@ public class TransactionService {
 
             //(Type check for the accounts may be implemented to here...)
 
+                log.info("Account tries to transfer");
+
                 // Add recieved_account balance to the recieved_account balance
                 fromAcc.setBalance(fromAcc.getBalance() - transactionAmount);
                 // Save to the repo
@@ -79,6 +81,8 @@ public class TransactionService {
 
         transactionRepository.save(newTransaction);
         // Return TransactionDTO
+
+        log.info(String.valueOf(newTransaction.getTransferAmount()));
 
         return TransactionDTO.builder()
                 .id(newTransaction.getId())
@@ -118,12 +122,14 @@ public class TransactionService {
     }
     private void validateAccOwner(Account account, String userPhone){
         if(!Objects.equals(account.getUser().getPhone(), userPhone)){
+            log.error("Insufficient permission.");
             throw new IllegalArgumentException("User does not have permission to delete this account.");
         }
     }
     private void validateAccBalance(Account account, Float validationAmount){
         if(account.getBalance() < validationAmount){
-            throw new IllegalArgumentException("Account has balance. Try to transfer it to the different account.");
+            log.error("Insufficient balance.");
+            throw new IllegalArgumentException("Account has insufficient balance.");
         }
     }
 
