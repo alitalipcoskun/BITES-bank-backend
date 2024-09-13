@@ -1,5 +1,6 @@
 package com.example.banking_project.handler;
 
+import com.example.banking_project.exceptions.CreditCardNumberException;
 import com.example.banking_project.exceptions.ErrorMessage;
 import com.example.banking_project.exceptions.ResourceExistException;
 import com.example.banking_project.exceptions.ResourceNotFoundException;
@@ -8,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
@@ -87,6 +87,17 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler
     public ResponseEntity<ErrorMessage> IOException(IllegalArgumentException ex, WebRequest req){
         log.error(ex.getMessage());
         return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED)
+                .body(ErrorMessage.builder()
+                        .timestamp(new Date())
+                        .message(ex.getMessage())
+                        .description(req.getDescription(false))
+                        .build());
+    }
+
+    @ExceptionHandler(CreditCardNumberException.class)
+    public ResponseEntity<ErrorMessage> creditCardError(CreditCardNumberException ex, WebRequest req){
+        log.error(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)
                 .body(ErrorMessage.builder()
                         .timestamp(new Date())
                         .message(ex.getMessage())

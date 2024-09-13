@@ -2,14 +2,13 @@ package com.example.banking_project.services;
 
 import com.example.banking_project.entities.Account;
 import com.example.banking_project.entities.User;
+import com.example.banking_project.exceptions.CreditCardNumberException;
 import com.example.banking_project.exceptions.ResourceExistException;
-import com.example.banking_project.exceptions.ResourceNotFoundException;
 import com.example.banking_project.repos.AccountRepository;
 import com.example.banking_project.repos.UserRepository;
 import com.example.banking_project.requests.AccAddBalanceReq;
 import com.example.banking_project.requests.CreateAccountRequest;
 import com.example.banking_project.requests.DelAccRequest;
-import com.example.banking_project.requests.GetAccountRequest;
 import com.example.banking_project.dtos.AccountDTO;
 import com.example.banking_project.responses.AccOwnerResponse;
 import jakarta.transaction.Transactional;
@@ -23,6 +22,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -69,7 +71,7 @@ public class AccountService {
     }
 
     public List<AccountDTO> getAccounts(String userPhone){
-        // Add phone validation with jwt.!!!
+
         //Extracting unique data from request
         //Validate that current user has permission to see the accounts
         String validationPhone = extractPhone();
@@ -150,7 +152,13 @@ public class AccountService {
 
 
     @Transactional
-    public AccountDTO addBalance(AccAddBalanceReq request) {
+    public AccountDTO addBalance(AccAddBalanceReq request){
+        log.info(request.getExpirationDate());
+        log.info(request.getCardNumber());
+        checkCardExpirationDate(request.getExpirationDate());
+        checkCreditCardNo(request.getCardNumber());
+
+
         Account account = extractAccByNo(request.getAccountNo());
         // Search for an annotation to use for this function.
         //Setting new balance to the account
@@ -247,5 +255,44 @@ public class AccountService {
         return Arrays.stream(username.split(" "))
                 .map(s -> s.charAt(0) + "*".repeat(s.length() - 1))
                 .collect(Collectors.joining(" "));
+    }
+
+    private void checkCardExpirationDate(String expirationDate) {
+        DateFormat dateFormat = new SimpleDateFormat("MM/yy");
+
+        Date cardDate = null;
+        try {
+            cardDate = dateFormat.parse(expirationDate);
+        } catch (ParseException e) {
+            throw new CreditCardNumberException("Enter a valid date!");
+        }
+        Date currentDate = new Date();
+
+        if(currentDate.after(cardDate)){
+            throw new CreditCardNumberException("Your card is out of date");
+        }
+    }
+
+    private void checkCreditCardNo(String creditCard){
+        Integer digitAmount = creditCard.length();
+
+        Integer digitSum = 0;
+        Boolean isSecond = false;
+
+        for(int i = digitAmount - 1; i >=0; i--){
+            int digit = creditCard.charAt(i) - '0';
+            if(isSecond){
+                digit = digit * 2;
+            }
+
+            digitSum += digit / 10;
+            digitSum += digit % 10;
+
+            isSecond = !isSecond;
+        }
+        if(digitSum % 10 != 0){
+            log.error("Credit card number error");
+            throw new CreditCardNumberException("Credit card number is invalid");
+        }
     }
 }

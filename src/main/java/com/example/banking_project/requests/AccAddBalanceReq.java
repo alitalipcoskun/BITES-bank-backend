@@ -11,5 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class AccAddBalanceReq {
     private String accountNo;
+    private String cardNumber;
+    private String expirationDate;
     private Float balanceChange;
 }
