@@ -73,6 +73,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             //To extract the user information, another class is created in this class. It is named as username because of the
             //service that is provided by Spring Boot.
             userPhone = jwtService.extractUsername(jwt);
+            log.info(userPhone);
 
             //Checking user permission and whether user is in database or not.
             //SecurityContextHolder.getContext().getAuthentication() -> NULL means user is not authenticated yet (not connected yet).

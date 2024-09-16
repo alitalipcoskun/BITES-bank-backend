@@ -8,6 +8,7 @@ import com.example.banking_project.exceptions.ResourceExistException;
 import com.example.banking_project.exceptions.ResourceNotFoundException;
 import com.example.banking_project.repos.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
@@ -88,9 +90,10 @@ public class AuthenticationService {
                 )
         ); // Thrown errors has caught by GlobalExceptionHandler.
 
+        log.info(user.getPhone());
         //If user is in db, returns its permission
         String jwt = jwtService.generateToken(user);
-
+        log.info(jwt);
         return buildResponse(jwt, user.getRole());
     }
 

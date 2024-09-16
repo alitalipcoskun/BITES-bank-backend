@@ -2,6 +2,7 @@ package com.example.banking_project.controllers;
 
 
 import com.example.banking_project.dtos.AccountDTO;
+import com.example.banking_project.exceptions.UnauthorizedActionError;
 import com.example.banking_project.requests.*;
 import com.example.banking_project.responses.AccOwnerResponse;
 import com.example.banking_project.services.AccountService;
@@ -33,9 +34,9 @@ public class AccountController {
     }
 
     @GetMapping("/search-account-owner")
-    public ResponseEntity<AccOwnerResponse> accountOwner(
+    public ResponseEntity<AccOwnerResponse> accountOwnerSearch(
             @RequestParam("no") String accountNo
-    ){
+    ) throws UnauthorizedActionError {
 
         return ResponseEntity.ok(accountService.searchOwner(accountNo));
     }

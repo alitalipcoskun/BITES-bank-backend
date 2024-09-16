@@ -1,14 +1,11 @@
 package com.example.banking_project.handler;
 
-import com.example.banking_project.exceptions.CreditCardNumberException;
-import com.example.banking_project.exceptions.ErrorMessage;
-import com.example.banking_project.exceptions.ResourceExistException;
-import com.example.banking_project.exceptions.ResourceNotFoundException;
+import com.example.banking_project.exceptions.*;
 import jakarta.servlet.ServletException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.tomcat.websocket.AuthenticationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
@@ -98,6 +95,17 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler
     public ResponseEntity<ErrorMessage> creditCardError(CreditCardNumberException ex, WebRequest req){
         log.error(ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)
+                .body(ErrorMessage.builder()
+                        .timestamp(new Date())
+                        .message(ex.getMessage())
+                        .description(req.getDescription(false))
+                        .build());
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ErrorMessage> unauthorizedActionError(UnauthorizedActionError ex, WebRequest req){
+        log.error(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(ErrorMessage.builder()
                         .timestamp(new Date())
                         .message(ex.getMessage())
