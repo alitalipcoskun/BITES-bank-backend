@@ -2,15 +2,12 @@ package com.example.banking_project.controllers;
 
 
 import com.example.banking_project.dtos.AccountDTO;
-import com.example.banking_project.exceptions.UnauthorizedActionError;
 import com.example.banking_project.requests.*;
 import com.example.banking_project.responses.AccOwnerResponse;
 import com.example.banking_project.services.AccountService;
-import com.example.banking_project.services.TransactionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,7 +33,7 @@ public class AccountController {
     @GetMapping("/search-account-owner")
     public ResponseEntity<AccOwnerResponse> accountOwnerSearch(
             @RequestParam("no") String accountNo
-    ) throws UnauthorizedActionError {
+    ){
 
         return ResponseEntity.ok(accountService.searchOwner(accountNo));
     }

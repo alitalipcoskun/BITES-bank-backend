@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import org.hibernate.annotations.CreationTimestamp;
 
-import java.util.List;
 
 // Data creates automatically Getters and Setters for the attributes of the class.
 @Data

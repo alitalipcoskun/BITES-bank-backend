@@ -1,15 +1,12 @@
 package com.example.banking_project.services;
 
 
-import com.example.banking_project.config.JwtService;
 import com.example.banking_project.dtos.TransactionDTO;
 import com.example.banking_project.entities.Account;
 import com.example.banking_project.entities.Transaction;
-import com.example.banking_project.exceptions.ResourceExistException;
 import com.example.banking_project.exceptions.ResourceNotFoundException;
 import com.example.banking_project.repos.AccountRepository;
 import com.example.banking_project.repos.TransactionRepository;
-import com.example.banking_project.repos.UserRepository;
 import com.example.banking_project.requests.ListTransactionsReq;
 import com.example.banking_project.requests.TransferMoneyReq;
 import jakarta.transaction.Transactional;

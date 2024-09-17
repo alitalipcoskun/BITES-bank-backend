@@ -4,7 +4,7 @@ import com.example.banking_project.entities.Account;
 import com.example.banking_project.entities.User;
 import com.example.banking_project.exceptions.CreditCardNumberException;
 import com.example.banking_project.exceptions.ResourceExistException;
-import com.example.banking_project.exceptions.UnauthorizedActionError;
+import com.example.banking_project.exceptions.ResourceNotFoundException;
 import com.example.banking_project.repos.AccountRepository;
 import com.example.banking_project.repos.UserRepository;
 import com.example.banking_project.requests.AccAddBalanceReq;
@@ -17,7 +17,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.tomcat.websocket.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -241,7 +240,7 @@ public class AccountService {
         )).collect(Collectors.toList());
     }
 
-    public AccOwnerResponse searchOwner(String accountNo) throws UnauthorizedActionError {
+    public AccOwnerResponse searchOwner(String accountNo){
         String ownerPhone = extractPhone();
         Account account = extractAccByNo(accountNo);
         checkAccountOwner(ownerPhone, account.getUser().getPhone());
@@ -254,9 +253,10 @@ public class AccountService {
                 .build();
     }
 
-    private void checkAccountOwner(String ownerPhone, String userPhone) throws UnauthorizedActionError {
+    private void checkAccountOwner(String ownerPhone, String userPhone){
         if(!Objects.equals(ownerPhone, userPhone)){
-            throw new UnauthorizedActionError("User does not have permission to see this account information");
+            // New error should get implemented.
+            throw new ResourceNotFoundException("User does not have permission to see this account information");
         }
     }
 

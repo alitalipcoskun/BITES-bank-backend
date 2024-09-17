@@ -102,14 +102,4 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler
                         .build());
     }
 
-    @ExceptionHandler(AuthenticationException.class)
-    public ResponseEntity<ErrorMessage> unauthorizedActionError(UnauthorizedActionError ex, WebRequest req){
-        log.error(ex.getMessage());
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(ErrorMessage.builder()
-                        .timestamp(new Date())
-                        .message(ex.getMessage())
-                        .description(req.getDescription(false))
-                        .build());
-    }
 }

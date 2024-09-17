@@ -162,3 +162,10 @@ public class GlobalExceptionHandler{
 
 This annotation will help us to catch all of the exceptions thrown and send necesarry feedbacks to the frontend for
 every service.
+
+```bash
+docker start redis-container
+docker exec -it redis redis-cli
+docker stop redis-container
+
+```

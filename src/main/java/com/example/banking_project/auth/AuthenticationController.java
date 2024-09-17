@@ -4,7 +4,6 @@ This controller have two endpoints for login and sign up screens.
 */
 
 import com.example.banking_project.dtos.UserDTO;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 

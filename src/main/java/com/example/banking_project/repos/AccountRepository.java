@@ -1,7 +1,6 @@
 package com.example.banking_project.repos;
 
 import com.example.banking_project.entities.Account;
-import jakarta.validation.constraints.NotEmpty;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
