@@ -164,8 +164,8 @@ This annotation will help us to catch all of the exceptions thrown and send nece
 every service.
 
 ```bash
-docker start redis-container
+docker start redis
 docker exec -it redis redis-cli
-docker stop redis-container
+docker stop redis
 
 ```

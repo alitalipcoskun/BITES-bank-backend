@@ -57,12 +57,14 @@ public class JwtService {
 
     public String buildToken(Map<String, Object> extraClaims, UserDetails userDetails){
         log.info("JWT successfully generated.");
+        Date expirationDate = new Date(System.currentTimeMillis() + (1000 * 60 * 60 * 24));
+        log.info("Token expiration date: " + expirationDate);
         return Jwts
                 .builder()
                 .setClaims(extraClaims)
                 .setSubject(userDetails.getUsername()) //We set our subject in here.
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + (1000 * 60 * 60 * 24)))
+                .setExpiration(expirationDate)
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -71,7 +73,7 @@ public class JwtService {
         //It will check whether token is owned by user or not
         log.info("JWT is getting checked...");
         final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
+        return (username.equals(userDetails.getUsername()));
     }
 
     private boolean isTokenExpired(String token) {

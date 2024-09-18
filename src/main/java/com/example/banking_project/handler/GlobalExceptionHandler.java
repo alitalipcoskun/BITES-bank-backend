@@ -61,6 +61,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorMessage> IllegalArgumentException(IllegalArgumentException ex, WebRequest request){
         log.error("Illegal Argument Exception");
+        log.error(ex.getMessage());
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(ErrorMessage.builder()
                         .timestamp(new Date())
