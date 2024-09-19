@@ -6,6 +6,7 @@ This controller have two endpoints for login and sign up screens.
 import com.example.banking_project.dtos.UserDTO;
 import com.example.banking_project.requests.CodeValidateRequest;
 import com.example.banking_project.requests.PasswordRecoveryRequest;
+import com.example.banking_project.requests.ValidPasswordChangeRequest;
 import com.example.banking_project.services.PasswordRecoveryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -50,6 +51,11 @@ public class AuthenticationController {
     @PostMapping("/recover-password")
     public ResponseEntity<String> findValue(@Valid @RequestBody CodeValidateRequest request) throws ParseException {
         return ResponseEntity.ok(passwordService.getPasswordRecoveryData(request));
+    }
+
+    @PostMapping("/password-change")
+    public ResponseEntity<String> passwordChange(@Valid @RequestBody ValidPasswordChangeRequest request) throws ParseException {
+        return ResponseEntity.ok(passwordService.securePasswordChange(request));
     }
 
 }

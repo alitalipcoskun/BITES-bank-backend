@@ -103,4 +103,26 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler
                         .build());
     }
 
+    @ExceptionHandler(ExpiredTokenException.class)
+    public ResponseEntity<ErrorMessage> expiredToken(ExpiredTokenException ex, WebRequest req){
+        log.error(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(ErrorMessage.builder()
+                        .timestamp(new Date())
+                        .message(ex.getMessage())
+                        .description(req.getDescription(false))
+                        .build());
+    }
+
+    @ExceptionHandler(CodeNotMatchError.class)
+    public ResponseEntity<ErrorMessage> codeError(CodeNotMatchError ex, WebRequest req){
+        log.error(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(ErrorMessage.builder()
+                        .timestamp(new Date())
+                        .message(ex.getMessage())
+                        .description(req.getDescription(false))
+                        .build());
+    }
+
 }

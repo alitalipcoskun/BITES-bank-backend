@@ -108,4 +108,9 @@ public class UserService {
             throw new IllegalArgumentException("Current password value that you've entered does not match with your current password");
         }
     }
+
+    public User findUserByMail(String mail) {
+        return userRepository.findByMail(mail)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    }
 }

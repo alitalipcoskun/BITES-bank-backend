@@ -27,8 +27,12 @@ public class TransactionController {
     }
     @GetMapping("/list-transactions")
     public ResponseEntity<List<TransactionDTO>> listTransactions(
-            @Valid @RequestBody ListTransactionsReq request
+            @Valid @RequestParam("phoneNumber") String phoneNumber,
+            @Valid @RequestParam("accountNo") String accountNo
     ){
-        return ResponseEntity.ok(transactionService.listTransaction(request));
+        return ResponseEntity.ok(transactionService.listTransaction(ListTransactionsReq.builder()
+                .accountNo(accountNo)
+                .phoneNumber(phoneNumber)
+                .build()));
     }
 }

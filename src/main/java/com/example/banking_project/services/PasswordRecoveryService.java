@@ -2,12 +2,15 @@ package com.example.banking_project.services;
 
 import com.example.banking_project.entities.PasswordRecovery;
 import com.example.banking_project.entities.User;
+import com.example.banking_project.exceptions.CodeNotMatchError;
+import com.example.banking_project.exceptions.ExpiredTokenException;
 import com.example.banking_project.exceptions.ResourceExistException;
 import com.example.banking_project.exceptions.ResourceNotFoundException;
 import com.example.banking_project.repos.PasswordRecoveryRepository;
 import com.example.banking_project.repos.UserRepository;
 import com.example.banking_project.requests.CodeValidateRequest;
 import com.example.banking_project.requests.PasswordRecoveryRequest;
+import com.example.banking_project.requests.ValidPasswordChangeRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +32,8 @@ public class PasswordRecoveryService {
     private final PasswordRecoveryRepository repository;
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
+    private final UserService userService;
+
 
     private static Integer RECOVERY_PSWRD_BOUND = 1000000;
 
@@ -36,10 +41,7 @@ public class PasswordRecoveryService {
     public String createToken(PasswordRecoveryRequest request) {
         String token = generateRandomNumber();
         // Verify that entered e-mail is registered to the service.
-        Optional<User> user = userRepository.findByMail(request.getMail());
-        if (user.isEmpty()) {
-            throw new ResourceNotFoundException("User does not exist");
-        }
+        userService.findUserByMail(request.getMail());
 
         boolean result = searchRecoveryData(request.getMail());
 
@@ -127,7 +129,7 @@ public class PasswordRecoveryService {
     }
 
     @Transactional
-    public List<PasswordRecovery> clearExpiredRecoveryData() throws ParseException {
+    public void clearExpiredRecoveryData() throws ParseException {
         Set<String> keys = redisTemplate.keys("PasswordRecovery:*");
         List<PasswordRecovery> allRecoveries = new ArrayList<>();
         long currentTimeMillis = System.currentTimeMillis();
@@ -150,7 +152,6 @@ public class PasswordRecoveryService {
 
         }
 
-        return allRecoveries;
     }
 
     private Date strToDate(String dateInput) throws ParseException{
@@ -158,4 +159,45 @@ public class PasswordRecoveryService {
         return dateFormat.parse(dateInput);
     }
 
+    public String securePasswordChange(ValidPasswordChangeRequest request) throws ParseException {
+        clearExpiredRecoveryData();
+        String newPassword = request.getNewPassword();
+        String key = "PasswordRecovery:" + request.getMail();
+        // Fetching user information from database
+        User user = userService.findUserByMail(request.getMail());
+
+        // Fetching redis information
+        Map<Object, Object> recoveryInfo = redisTemplate.opsForHash().entries(key);
+
+        checkRecoveryInfo(recoveryInfo, request.getCode());
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+
+        return "Password changed successfully!";
+    }
+
+    private void checkRecoveryInfo(Map<Object, Object> recovery, String code) throws ParseException {
+        String key = "PasswordRecovery:" + (String) recovery.get("mail");
+
+        // Getting expiration date
+        String expirationDateStr = (String) recovery.get("expirationDate");
+
+        // Getting code
+        String redisCode = (String) recovery.get("token");
+
+        Date expirationDate = strToDate(expirationDateStr);
+
+        if (expirationDate.before(new Date())) {
+            redisTemplate.delete(key);
+            throw new ExpiredTokenException("Token time is expired. Start the recovery process again");
+        }
+
+        if (!redisCode.equals(code)){
+            throw new CodeNotMatchError("Check the entered code again");
+        }
+
+
+    }
 }
+

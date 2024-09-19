@@ -16,7 +16,7 @@ Password saving with mail or mobile phone number!
 Record file research.
 
 ## Project Creation
-![Project.png](readme_images%2FProject.png)
+<img src="(/readme_images/Project.png" width="50%" height="auto" alt="Screenshot">
 
 Figure: `start.spring.io` interface for beginning of the project.
 
@@ -168,4 +168,21 @@ docker start redis
 docker exec -it redis redis-cli
 docker stop redis
 
+HGETALL "PasswordRecovery:
 ```
+
+## Redis
+
+## Websocket
+Websocket is a communication protocol that provides duplex communication channels with one TCP connection. In addition,
+it can be used in any client or server application. Main priority of websocket is providing
+persistent connection between a client and a server for sending and receiving data in any time.
+
+### Advantages
+- It is commonly used real time data exchange.
+- Bi-Directional connection between the client and the server
+- It does not require headers which is efficient.
+- Provides persistent connection. Once the connection is established, it remains open and waits for the client
+or the server to close it.
+
+<img src="(/readme_images/websocket_diagram.png" width="50%" height="auto" alt="Screenshot">
