@@ -22,7 +22,7 @@ public class TransactionController {
     @PostMapping("/transfer-money")
     public ResponseEntity<TransactionDTO> transferMoney(
             @Valid @RequestBody TransferMoneyReq request
-    ){
+    ) throws Exception {
         return ResponseEntity.ok(transactionService.makeTransaction(request));
     }
     @GetMapping("/list-transactions")
