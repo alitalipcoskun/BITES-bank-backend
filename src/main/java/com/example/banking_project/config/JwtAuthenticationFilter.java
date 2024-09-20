@@ -62,7 +62,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         //If header is null or header is NOT A FIT (be careful about the conditions of if statements.) for JWToken, return it as null.
         if(authHeader == null || !authHeader.startsWith("Bearer ")){
             filterChain.doFilter(request, response);
-            return;
         }
         else{
             //Try catch block wraps the logic and uses HandlerExceptionResolver to forward the error to the global exception handler.

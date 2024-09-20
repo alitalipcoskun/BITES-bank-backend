@@ -59,7 +59,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ErrorMessage> IllegalArgumentException(IllegalArgumentException ex, WebRequest request){
+    public ResponseEntity<ErrorMessage> illegalArgumentException(IllegalArgumentException ex, WebRequest request){
         log.error("Illegal Argument Exception");
         log.error(ex.getMessage());
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
@@ -71,7 +71,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler
     }
 
     @ExceptionHandler(ServletException.class)
-    public ResponseEntity<ErrorMessage> ServletException(IllegalArgumentException ex, WebRequest req){
+    public ResponseEntity<ErrorMessage> servletException(IllegalArgumentException ex, WebRequest req){
         log.error(ex.getMessage());
         return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED)
                 .body(ErrorMessage.builder()
@@ -82,7 +82,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler
     }
 
     @ExceptionHandler(IOException.class)
-    public ResponseEntity<ErrorMessage> IOException(IllegalArgumentException ex, WebRequest req){
+    public ResponseEntity<ErrorMessage> ioException(IllegalArgumentException ex, WebRequest req){
         log.error(ex.getMessage());
         return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED)
                 .body(ErrorMessage.builder()

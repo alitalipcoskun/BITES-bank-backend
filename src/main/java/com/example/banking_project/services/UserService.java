@@ -39,7 +39,7 @@ public class UserService {
         User user = findUserByPhone(userPhone);
 
         //Perform convertion user account information to String list.
-        List<String> accList = user.getAccounts().stream().map(Account::getNo).collect(Collectors.toList());
+        List<String> accList = user.getAccounts().stream().map(Account::getNo).toList();
 
         //Returning user information
         return UserDTO.builder()
@@ -49,8 +49,8 @@ public class UserService {
                 .mail(user.getMail())
                 .surname(user.getSurname())
                 .role(user.getRole())
-                .created_at(user.getCreated_at())
-                .updated_at(user.getUpdated_at())
+                .createdAt(user.getCreatedAt())
+                .updatedAt(user.getUpdatedAt())
                 .accounts(accList)
                 .build();
     }
@@ -102,8 +102,8 @@ public class UserService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
-    private void checkPassword(String current_password, String encoded_password){
-        if(!passwordEncoder.matches(current_password, encoded_password)){
+    private void checkPassword(String currentPassword, String encodedPassword){
+        if(!passwordEncoder.matches(currentPassword, encodedPassword)){
             log.error("Match failed!");
             throw new IllegalArgumentException("Current password value that you've entered does not match with your current password");
         }

@@ -10,5 +10,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CreateAccountRequest {
-    private String money_type;
+    private String moneyType;
 }

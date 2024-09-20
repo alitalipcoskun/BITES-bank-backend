@@ -7,7 +7,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.List;
+import java.util.UUID;
 
 @Data // Data creates automatically Getters and Setters for the attributes of the class.
 @Builder
@@ -16,7 +19,9 @@ import java.util.List;
 @Entity
 @Table(name="\"account\"")
 @Accessors(chain=true)
-public class Account {
+public class Account implements Serializable {
+    @Serial
+    private static final long serialVersionUID = UUID.randomUUID().getMostSignificantBits() & Long.MAX_VALUE;
 
     //Entity class to create account table and use it.
 
@@ -30,7 +35,7 @@ public class Account {
 
     private String no;
     private float balance;
-    private String money_type;
+    private String moneyType;
 
     @OneToMany(mappedBy = "fromAccount")
     private List<Transaction> sentTransactions;

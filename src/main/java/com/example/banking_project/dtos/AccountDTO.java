@@ -14,7 +14,7 @@ public class AccountDTO {
     private Long id;
     private String no;
     private float balance;
-    private String money_type;
+    private String moneyType;
     private Long userId;
 }
 

@@ -153,7 +153,7 @@ public class TransactionService {
                 transaction.getToAccount().getNo(),
                 transaction.getDate(),
                 transaction.getTransferAmount()
-        )).collect(Collectors.toList());
+        )).toList();
 
     }
 }

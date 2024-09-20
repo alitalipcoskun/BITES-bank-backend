@@ -8,12 +8,6 @@ There is no need for XML configuration and no code generation.
 
 `https://start.spring.io` allow developers to use specified Spring Boot version and satisfy requirements.
 
-## Future Features
-Does the `password` should be sent encrypted to the `AuthenticationService`?
-Transaction algorithm? -> The luhn algorithm. may be implemented for checking purposes and creation of accNo.
-dummy Credit card  control algorithm.
-Password saving with mail or mobile phone number!
-Record file research.
 
 ## Project Creation
 <img src="(/readme_images/Project.png" width="50%" height="auto" alt="Screenshot">

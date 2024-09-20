@@ -22,9 +22,9 @@ public class UserDTO {
     private Long id;
 
 
-    private Date created_at;
+    private Date createdAt;
 
-    private Date updated_at;
+    private Date updatedAt;
     private String name;
     private String surname;
 

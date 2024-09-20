@@ -40,7 +40,6 @@ public class AuthenticationService {
             Moreover, it will return the generated token out of it.
         */
 
-        // Verify that userPhone or mail does not registered on database, otherwise throws error.
 
 
         // Verify that phone does not exist on the user database

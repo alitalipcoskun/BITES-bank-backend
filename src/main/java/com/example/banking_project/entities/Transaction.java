@@ -8,6 +8,10 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import org.hibernate.annotations.CreationTimestamp;
 
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.UUID;
+
 
 // Data creates automatically Getters and Setters for the attributes of the class.
 @Data
@@ -17,7 +21,9 @@ import org.hibernate.annotations.CreationTimestamp;
 @Entity
 @Table(name="\"transaction\"")
 @Accessors(chain=true)
-public class Transaction {
+public class Transaction implements Serializable {
+    @Serial
+    private static final long serialVersionUID = UUID.randomUUID().getMostSignificantBits() & Long.MAX_VALUE;
     //Entity class for transaction table creation and processes.
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

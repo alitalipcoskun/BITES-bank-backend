@@ -44,7 +44,7 @@ public class AuthenticationController {
     @PostMapping("/forget-password")
     public ResponseEntity<String> listTransactions(
             @Valid @RequestBody PasswordRecoveryRequest request
-    ){
+    ) throws ParseException {
         return ResponseEntity.ok(passwordService.createToken(request));
     }
 

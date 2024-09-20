@@ -34,14 +34,21 @@ public class PasswordRecoveryService {
     private final UserRepository userRepository;
     private final UserService userService;
 
+    private static final String redisSearchKey= "PasswordRecovery:";
+    private static final String redisStoredKey = "token";
 
-    private static Integer RECOVERY_PSWRD_BOUND = 1000000;
+
+    private static final Integer RECOVERY_PSWRD_BOUND = 1000000;
+
+    private static final Random random = new Random();
+
 
     @Transactional
-    public String createToken(PasswordRecoveryRequest request) {
+    public String createToken(PasswordRecoveryRequest request) throws ParseException {
         String token = generateRandomNumber();
         // Verify that entered e-mail is registered to the service.
         userService.findUserByMail(request.getMail());
+        clearExpiredRecoveryData();
 
         boolean result = searchRecoveryData(request.getMail());
 
@@ -66,9 +73,9 @@ public class PasswordRecoveryService {
     }
 
     private void saveRedis(PasswordRecovery recovery) {
-        String key = "PasswordRecovery:" + recovery.getMail();
+        String key = redisSearchKey + recovery.getMail();
         redisTemplate.opsForHash().putAll(key, Map.of(
-                "token", recovery.getToken(),
+                redisStoredKey, recovery.getToken(),
                 "creationDate", recovery.getCreationDate(),
                 "expirationDate", recovery.getExpirationDate(),
                 "id", recovery.getId(),
@@ -76,12 +83,12 @@ public class PasswordRecoveryService {
     }
 
     public String getPasswordRecoveryData(CodeValidateRequest request) throws ParseException {
-        String key = "PasswordRecovery:" + request.getMail();
+        String key = redisSearchKey + request.getMail();
         Map<Object, Object> recoveryInfo = redisTemplate.opsForHash().entries(key);
         if (recoveryInfo.isEmpty()) {
             throw new ResourceNotFoundException("Validate your request, try again with going forget password.");
         }
-        if (recoveryInfo.get("token").equals(request.getToken())) {
+        if (recoveryInfo.get(redisStoredKey).equals(request.getToken())) {
             Date expDate = strToDate((String) recoveryInfo.get("expirationDate"));
             if (expDate.after(new Date())){
                 return "True";
@@ -94,7 +101,7 @@ public class PasswordRecoveryService {
 
 
     private boolean searchRecoveryData(String mail) {
-        String key = "PasswordRecovery:" + mail;
+        String key = redisSearchKey + mail;
         Map<Object, Object> recoveryInfo = redisTemplate.opsForHash().entries(key);
 
         if (recoveryInfo.isEmpty()) {
@@ -121,17 +128,15 @@ public class PasswordRecoveryService {
     }
 
     public static String generateRandomNumber() {
-        Random random = new Random();
+
         int number = random.nextInt(RECOVERY_PSWRD_BOUND);
         log.info(String.valueOf(number));
-        System.out.println(number);
         return String.format("%06d", number);
     }
 
     @Transactional
     public void clearExpiredRecoveryData() throws ParseException {
-        Set<String> keys = redisTemplate.keys("PasswordRecovery:*");
-        List<PasswordRecovery> allRecoveries = new ArrayList<>();
+        Set<String> keys = redisTemplate.keys(redisSearchKey+'*');
         long currentTimeMillis = System.currentTimeMillis();
 
 
@@ -162,7 +167,7 @@ public class PasswordRecoveryService {
     public String securePasswordChange(ValidPasswordChangeRequest request) throws ParseException {
         clearExpiredRecoveryData();
         String newPassword = request.getNewPassword();
-        String key = "PasswordRecovery:" + request.getMail();
+        String key = redisSearchKey + request.getMail();
         // Fetching user information from database
         User user = userService.findUserByMail(request.getMail());
 
@@ -178,13 +183,13 @@ public class PasswordRecoveryService {
     }
 
     private void checkRecoveryInfo(Map<Object, Object> recovery, String code) throws ParseException {
-        String key = "PasswordRecovery:" + (String) recovery.get("mail");
+        String key = redisSearchKey + (String) recovery.get("mail");
 
         // Getting expiration date
         String expirationDateStr = (String) recovery.get("expirationDate");
 
         // Getting code
-        String redisCode = (String) recovery.get("token");
+        String redisCode = (String) recovery.get(redisStoredKey);
 
         Date expirationDate = strToDate(expirationDateStr);
 

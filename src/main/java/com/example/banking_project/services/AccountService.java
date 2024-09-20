@@ -53,7 +53,7 @@ public class AccountService {
                 .no(generateAccountNo())
                 .user(user) // Set the user
                 .balance(0)
-                .money_type(request.getMoney_type())
+                .moneyType(request.getMoneyType())
                 .build();
 
         // Save the new account to the database
@@ -65,7 +65,7 @@ public class AccountService {
         return AccountDTO.builder()
                 .id(newAccount.getId())
                 .balance(newAccount.getBalance())
-                .money_type(newAccount.getMoney_type())
+                .moneyType(newAccount.getMoneyType())
                 .no(newAccount.getNo())
                 .userId(user.getId())
                 .build();
@@ -88,9 +88,9 @@ public class AccountService {
                 account.getId(),
                 account.getNo(),
                 account.getBalance(),
-                account.getMoney_type(),
+                account.getMoneyType(),
                 account.getUser().getId()
-        )).collect(Collectors.toList());
+        )).toList();
     }
 
     private void checkPermission(String validationPhone, String userPhone){
@@ -174,7 +174,7 @@ public class AccountService {
                 .userId(returnedAccount.getUser().getId())
                 .balance(returnedAccount.getBalance())
                 .id(returnedAccount.getId())
-                .money_type(returnedAccount.getMoney_type())
+                .moneyType(returnedAccount.getMoneyType())
                 .no(returnedAccount.getNo())
                 .build();
     }
@@ -212,7 +212,6 @@ public class AccountService {
 
     @Transactional
     public List<AccountDTO> deleteAccount(DelAccRequest request) {
-        //CHANGE IS MANDATORY
         //Extracting unique user claim
         String userPhone = extractPhone();
 
@@ -235,9 +234,9 @@ public class AccountService {
                 currAcc.getId(),
                 currAcc.getNo(),
                 currAcc.getBalance(),
-                currAcc.getMoney_type(),
+                currAcc.getMoneyType(),
                 currAcc.getUser().getId()
-        )).collect(Collectors.toList());
+        )).toList();
     }
 
     public AccOwnerResponse searchOwner(String accountNo){
@@ -288,7 +287,7 @@ public class AccountService {
         Integer digitAmount = creditCard.length();
 
         Integer digitSum = 0;
-        Boolean isSecond = false;
+        boolean isSecond = false;
 
         for(int i = digitAmount - 1; i >=0; i--){
             int digit = creditCard.charAt(i) - '0';

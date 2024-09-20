@@ -30,9 +30,9 @@ public class User implements UserDetails {
     private Long id;
 
     @CreationTimestamp
-    private Date created_at;
+    private Date createdAt;
     @UpdateTimestamp
-    private Date updated_at;
+    private Date updatedAt;
     private String name;
     private String surname;
     @Column(unique = true)
